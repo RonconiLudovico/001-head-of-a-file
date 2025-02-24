@@ -33,7 +33,7 @@ def print_lines(num):
         lines = file_name.readlines()
         
     for line in lines[:num]:
-        print(line)
+        print(line, end="")
 
 
 if __name__ == "__main__":
