@@ -1,39 +1,51 @@
 import sys
 
-def main():
-
-# Here we created a function in which, depending on the arguments of sys.argv, behaves differently
-# Case in which the arguments are only the script name and the file passed to the script
-    if len(sys.argv) == 2:
-        print_lines(10)
-
-# If there are more than 2 arguments
-    elif len(sys.argv) > 2:
-
-# Case in which the second argument is "-n", the number of lines printed should be the third argument
-        if sys.argv[1] == "-n":
-            num = int(sys.argv[2])
-            print_lines(num)
-
-# Case in which the second argument is "-v", the name of the file should be outputted before the lines        
-        elif sys.argv[1] == "-v":
-            print(f"====> {sys.argv[-1]} <====")
-
-# Case in which we combine the previous 2 cases
-            if sys.argv[2] == "-n":
-                num = int(sys.argv[3])
-                print_lines(num)
-
-
-def print_lines(num):
-
-# Here we created a function in which the last argument of sys.argv (file name) is opened and printed as many lines as num parameter
-    file = sys.argv[-1]
-    with open(file, 'r') as file_name:
-        lines = file_name.readlines()
+def print_head(filename, num_lines=10, verbose=False):
+    """Print the first `num_lines` of `filename`. Show filename if `verbose` is True."""
+    
+    try:
+        with open(filename, 'r') as file:
+            lines = file.readlines()
         
-    for line in lines[:num]:
-        print(line, end="")
+        output = [f"====> {filename} <====\n"] if verbose else []
+        output.extend(lines[:num_lines])
+        print("".join(output), end="\n" if verbose else "")
+
+    except Exception as e:
+        errors = {
+            FileNotFoundError: f"head: cannot open '{filename}' for reading: No such file or directory",
+            PermissionError: f"head: cannot open '{filename}': Permission denied"
+        }
+        print(errors.get(type(e), f"head: error reading '{filename}': {e}"), file=sys.stderr)
+
+
+def parse_args(args):
+    """Parse command-line arguments, returning (num_lines, verbose, filenames)."""
+    
+    num_lines = 10
+    verbose = "-v" in args
+    args = [arg for arg in args if arg != "-v"]
+
+    try:
+        n_index = args.index("-n")
+        num_lines = int(args[n_index + 1])
+        args = args[:n_index] + args[n_index + 2:]  # Remove "-n" and its value
+    except (ValueError, IndexError):
+        pass  # If "-n" is not found or invalid, default to 10
+
+    return num_lines, verbose, args
+
+
+def main():
+    
+    args = sys.argv[1:]
+    num_lines, verbose, filenames = parse_args(args)
+
+    filenames or sys.exit("head: missing file operand")  # Exit if no files provided
+
+    for file in filenames:
+        print_head(file, num_lines, verbose or len(filenames) > 1)
+
 
 
 if __name__ == "__main__":

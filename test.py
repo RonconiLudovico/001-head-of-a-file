@@ -30,5 +30,5 @@ class Test03(unittest.TestCase):
         '''
 
         result = subprocess.check_output(["python3", "script.py", "-v", "-n", "5", "example.txt"], text=True)
-        data = f"====> example.txt <====\nLine 1: This is the first line.\nLine 2: This is the second line.\nLine 3: This is the third line.\nLine 4: This is the fourth line.\nLine 5: This is the fifth line.\n"
+        data = f"====> example.txt <====\nLine 1: This is the first line.\nLine 2: This is the second line.\nLine 3: This is the third line.\nLine 4: This is the fourth line.\nLine 5: This is the fifth line.\n\n"
         self.assertEqual(result, data)
